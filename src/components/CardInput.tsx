@@ -1,7 +1,8 @@
 'use client';
 
 import { Currency } from '@/types';
-import { useState } from 'react';
+import { detectCardType } from '@/utils/format';
+import { validateAmount, validateCardNumber, validateCVV, validateExpiry, validateName } from '@/utils/validate';
 
 export interface CardFormData {
     cardholderName: string;
@@ -20,7 +21,31 @@ interface CardInputProps {
     disabled: boolean;
 }
 
-export default function CardInput({ form, onChange, onFocusChange, onSubmit, disabled }: CardInputProps) {
-    const [selected, setSelected] = useState({});
-    return <div>CardInput</div>;
+export default function CardInput({ form, onSubmit, disabled }: CardInputProps) {
+    const cardType = detectCardType(form.cardNumber);
+
+    const errors = {
+        cardholderName: validateName(form.cardholderName),
+        cardNumber: validateCardNumber(form.cardNumber),
+        expiry: validateExpiry(form.expiry),
+        cvv: validateCVV(form.cvv, cardType),
+        amount: validateAmount(form.amount),
+    };
+
+    const isValid = Object.values(errors).every((e) => e === null);
+
+    function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        if (!isValid || disabled) return;
+        onSubmit();
+    }
+
+    return (
+        <form
+            onSubmit={handleSubmit}
+            className='space-y-4 w-full'
+        >
+            CardInput
+        </form>
+    );
 }
