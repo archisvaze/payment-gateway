@@ -25,8 +25,20 @@ export default function page() {
     const loadHistory = usePaymentStore((s) => s.loadHistory);
 
     function handleSubmit() {
-        console.log(form);
+        submitPayment(form);
     }
+
+    function handleRetry() {
+        submitPayment(form);
+    }
+
+    function handleNewPayment() {
+        resetPayment();
+        setForm(initialForm);
+    }
+
+    const showForm = status === 'idle';
+    const showStatus = status !== 'idle';
 
     return (
         <main className='min-h-screen bg-gray-50 py-8 px-4'>
@@ -41,13 +53,15 @@ export default function page() {
                     focused={focusedField}
                 />
 
-                <CardInput
-                    form={form}
-                    onChange={setForm}
-                    onFocusChange={setFocusedField}
-                    onSubmit={handleSubmit}
-                    disabled={false}
-                />
+                {showForm && (
+                    <CardInput
+                        form={form}
+                        onChange={setForm}
+                        onFocusChange={setFocusedField}
+                        onSubmit={handleSubmit}
+                        disabled={false}
+                    />
+                )}
             </div>
         </main>
     );
