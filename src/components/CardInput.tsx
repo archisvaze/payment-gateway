@@ -3,7 +3,8 @@
 import { Currency } from '@/types';
 import { detectCardType, formatCardNumber, formatExpiry } from '@/utils/format';
 import { validateAmount, validateCardNumber, validateCVV, validateExpiry, validateName } from '@/utils/validate';
-import { Button, Input, Select } from 'antd';
+import { Alert, Button, Input, Select, Tag } from 'antd';
+import { useState } from 'react';
 
 export interface CardFormData {
     cardholderName: string;
@@ -23,6 +24,8 @@ interface CardInputProps {
 }
 
 export default function CardInput({ form, onChange, onFocusChange, onSubmit, disabled }: CardInputProps) {
+    const [selected, setSelected] = useState<Record<string, boolean>>({});
+
     const cardType = detectCardType(form.cardNumber);
 
     const errors = {
@@ -41,6 +44,11 @@ export default function CardInput({ form, onChange, onFocusChange, onSubmit, dis
         onChange({ ...form, [field]: value });
     }
 
+    function handleBlur(field: string) {
+        setSelected((prev) => ({ ...prev, [field]: true }));
+        onFocusChange(undefined);
+    }
+
     function handleSubmit(e: { preventDefault: () => void }) {
         e.preventDefault();
 
@@ -56,89 +64,133 @@ export default function CardInput({ form, onChange, onFocusChange, onSubmit, dis
             onSubmit={handleSubmit}
             className='space-y-4 w-full'
         >
-            <label htmlFor='cardholderName'>Cardholder Name</label>
-            <Input
-                id='cardholderName'
-                type='text'
-                value={form.cardholderName}
-                onChange={(e) => update('cardholderName', e.target.value)}
-                placeholder='John Doe'
-                disabled={disabled}
-                size='large'
-            />
-            <label htmlFor='cardNumber'>Card Number</label>
-            <Input
-                id='cardNumber'
-                type='text'
-                value={form.cardNumber}
-                onChange={(e) => update('cardNumber', formatCardNumber(e.target.value))}
-                maxLength={19}
-                placeholder='4242 4242 4242 4242'
-                disabled={disabled}
-                size='large'
-            />
+            <div className='form-field-container'>
+                <label htmlFor='cardholderName'>Cardholder Name</label>
+                <Input
+                    id='cardholderName'
+                    type='text'
+                    value={form.cardholderName}
+                    onChange={(e) => update('cardholderName', e.target.value)}
+                    placeholder='John Doe'
+                    disabled={disabled}
+                    size='large'
+                    onFocus={() => onFocusChange('name')}
+                    onBlur={() => handleBlur('cardholderName')}
+                />
+                {selected.cardholderName && errors.cardholderName && (
+                    <Alert
+                        title={errors.cardholderName}
+                        type='error'
+                    />
+                )}
+            </div>
 
-            <label htmlFor='expiry'>Expiry (MM/YY)</label>
-            <Input
-                id='expiry'
-                type='text'
-                value={form.expiry}
-                onChange={(e) => update('expiry', formatExpiry(e.target.value))}
-                maxLength={5}
-                placeholder='12/26'
-                disabled={disabled}
-                size='large'
-            />
+            <div className='form-field-container'>
+                <label htmlFor='cardNumber'>Card Number</label>
+                <Input
+                    id='cardNumber'
+                    type='text'
+                    value={form.cardNumber}
+                    onChange={(e) => update('cardNumber', formatCardNumber(e.target.value))}
+                    maxLength={19}
+                    placeholder='4242 4242 4242 4242'
+                    disabled={disabled}
+                    size='large'
+                    suffix={cardType !== 'unknown' ? <Tag>{cardType}</Tag> : null}
+                />
+                {selected.cardNumber && errors.cardNumber && (
+                    <Alert
+                        title={errors.cardNumber}
+                        type='error'
+                    />
+                )}
+            </div>
 
-            <label htmlFor='cvv'>CVV</label>
-            <Input
-                id='cvv'
-                type='password'
-                value={form.cvv}
-                onChange={(e) => {
-                    const digits = e.target.value.replace(/\D/g, '');
-                    update('cvv', digits.slice(0, 3));
-                }}
-                maxLength={3}
-                placeholder='123'
-                disabled={disabled}
-                size='large'
-            />
+            <div className='form-field-container'>
+                <label htmlFor='expiry'>Expiry (MM/YY)</label>
+                <Input
+                    id='expiry'
+                    type='text'
+                    value={form.expiry}
+                    onChange={(e) => update('expiry', formatExpiry(e.target.value))}
+                    maxLength={5}
+                    placeholder='12/26'
+                    disabled={disabled}
+                    size='large'
+                />
+                {selected.expiry && errors.expiry && (
+                    <Alert
+                        title={errors.expiry}
+                        type='error'
+                    />
+                )}
+            </div>
 
-            <label htmlFor='amount'>Amount</label>
+            <div className='form-field-container'>
+                <label htmlFor='cvv'>CVV</label>
+                <Input
+                    id='cvv'
+                    type='password'
+                    value={form.cvv}
+                    onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, '');
+                        update('cvv', digits.slice(0, 3));
+                    }}
+                    maxLength={3}
+                    placeholder='123'
+                    disabled={disabled}
+                    size='large'
+                />
+                {selected.cvv && errors.cvv && (
+                    <Alert
+                        title={errors.cvv}
+                        type='error'
+                    />
+                )}
+            </div>
 
-            <Input
-                id='amount'
-                type='text'
-                value={form.amount}
-                onChange={(e) => {
-                    const val = e.target.value.replace(/[^0-9.]/g, '');
-                    update('amount', val);
-                }}
-                placeholder='100.00'
-                disabled={disabled}
-                size='large'
-            />
+            <div className='form-field-container'>
+                <label htmlFor='amount'>Amount</label>
+                <Input
+                    id='amount'
+                    type='text'
+                    value={form.amount}
+                    onChange={(e) => {
+                        const val = e.target.value.replace(/[^0-9.]/g, '');
+                        update('amount', val);
+                    }}
+                    placeholder='100.00'
+                    disabled={disabled}
+                    size='large'
+                />
+                {selected.amount && errors.amount && (
+                    <Alert
+                        title={errors.amount}
+                        type='error'
+                    />
+                )}
+            </div>
 
-            <label htmlFor='currency'>Currency</label>
-
-            <Select
-                id='currency'
-                value={form.currency}
-                disabled={disabled}
-                className='w-full'
-                onSelect={(v) => update('currency', v)}
-                options={[
-                    { value: 'INR', label: 'INR' },
-                    { value: 'USD', label: 'USD' },
-                ]}
-                size='large'
-            />
+            <div className='form-field-container'>
+                <label htmlFor='currency'>Currency</label>
+                <Select
+                    id='currency'
+                    value={form.currency}
+                    disabled={disabled}
+                    className='w-full'
+                    onSelect={(v) => update('currency', v)}
+                    options={[
+                        { value: 'INR', label: 'INR' },
+                        { value: 'USD', label: 'USD' },
+                    ]}
+                    size='large'
+                />
+            </div>
 
             <Button
                 htmlType='submit'
                 type='primary'
-                className='w-full'
+                className='w-full mt-2'
                 size='large'
                 disabled={!isValid || disabled}
             >
