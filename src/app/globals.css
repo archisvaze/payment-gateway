@@ -33,6 +33,13 @@ button {
 .form-field-container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.form-field-container label {
+  font-size: 14px;
+}
+
+.form-field-container .ant-alert {
+  margin-top: 4px;
 }

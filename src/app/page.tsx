@@ -7,7 +7,7 @@ import TransactionHistory from '@/components/TransactionHistory';
 import { usePayment } from '@/hooks/usePayment';
 import { usePaymentStore } from '@/store/usePaymentStore';
 import { Button, Modal } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaHistory } from 'react-icons/fa';
 import { TiCreditCard } from 'react-icons/ti';
 
@@ -29,6 +29,10 @@ export default function page() {
 
     const transactions = usePaymentStore((s) => s.transactions);
     const loadHistory = usePaymentStore((s) => s.loadHistory);
+
+    useEffect(() => {
+        loadHistory();
+    }, [loadHistory]);
 
     function handleSubmit() {
         submitPayment(form);

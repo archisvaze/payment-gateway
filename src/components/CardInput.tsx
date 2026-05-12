@@ -3,7 +3,7 @@
 import { Currency } from '@/types';
 import { detectCardType, formatCardNumber, formatExpiry } from '@/utils/format';
 import { validateAmount, validateCardNumber, validateCVV, validateExpiry, validateName } from '@/utils/validate';
-import { Alert, Button, Input, Select, Tag } from 'antd';
+import { Alert, Button, Input, Select } from 'antd';
 import { useState } from 'react';
 
 export interface CardFormData {
@@ -96,7 +96,8 @@ export default function CardInput({ form, onChange, onFocusChange, onSubmit, dis
                     placeholder='4242 4242 4242 4242'
                     disabled={disabled}
                     size='large'
-                    suffix={cardType !== 'unknown' ? <Tag>{cardType}</Tag> : null}
+                    onFocus={() => onFocusChange('number')}
+                    onBlur={() => handleBlur('cardNumber')}
                 />
                 {selected.cardNumber && errors.cardNumber && (
                     <Alert
@@ -117,6 +118,8 @@ export default function CardInput({ form, onChange, onFocusChange, onSubmit, dis
                     placeholder='12/26'
                     disabled={disabled}
                     size='large'
+                    onFocus={() => onFocusChange('expiry')}
+                    onBlur={() => handleBlur('expiry')}
                 />
                 {selected.expiry && errors.expiry && (
                     <Alert
@@ -140,6 +143,8 @@ export default function CardInput({ form, onChange, onFocusChange, onSubmit, dis
                     placeholder='123'
                     disabled={disabled}
                     size='large'
+                    onFocus={() => onFocusChange('cvc')}
+                    onBlur={() => handleBlur('cvv')}
                 />
                 {selected.cvv && errors.cvv && (
                     <Alert
@@ -162,6 +167,7 @@ export default function CardInput({ form, onChange, onFocusChange, onSubmit, dis
                     placeholder='100.00'
                     disabled={disabled}
                     size='large'
+                    onBlur={() => handleBlur('amount')}
                 />
                 {selected.amount && errors.amount && (
                     <Alert
