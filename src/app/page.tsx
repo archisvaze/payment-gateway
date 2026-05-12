@@ -57,7 +57,7 @@ export default function page() {
                     <div className='w-full flex items-start justify-between gap-4 mb-8'>
                         <div className='flex flex-col items-center text-center flex-1'>
                             <TiCreditCard size={42} />
-                            <h1 className='text-2xl font-extrabold mb-8'>Payment Gateway</h1>
+                            <h1 className='text-2xl font-extrabold mb-4'>Payment Gateway</h1>
 
                             <Button
                                 onClick={() => setHistoryOpen(true)}
@@ -78,6 +78,8 @@ export default function page() {
                         cvv={form.cvv}
                         focused={focusedField}
                     />
+
+                    <div className='my-8'></div>
 
                     {showForm && (
                         <CardInput
