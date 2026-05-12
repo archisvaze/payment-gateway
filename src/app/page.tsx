@@ -1,6 +1,6 @@
 'use client';
 
-import { CardFormData } from '@/components/CardInput';
+import CardInput, { CardFormData } from '@/components/CardInput';
 import CardPreview from '@/components/CardPreview';
 import { useState } from 'react';
 
@@ -17,6 +17,10 @@ export default function page() {
     const [form, setForm] = useState<CardFormData>(initialForm);
     const [focusedField, setFocusedField] = useState<'name' | 'number' | 'expiry' | 'cvc' | undefined>(undefined);
 
+    function handleSubmit() {
+        console.log(form);
+    }
+
     return (
         <main className='min-h-screen bg-gray-50 py-8 px-4'>
             <div className='max-w-5xl mx-auto border'>
@@ -28,6 +32,14 @@ export default function page() {
                     expiry={form.expiry}
                     cvv={form.cvv}
                     focused={focusedField}
+                />
+
+                <CardInput
+                    form={form}
+                    onChange={setForm}
+                    onFocusChange={setFocusedField}
+                    onSubmit={handleSubmit}
+                    disabled={false}
                 />
             </div>
         </main>

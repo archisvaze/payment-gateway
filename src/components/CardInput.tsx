@@ -1,8 +1,9 @@
 'use client';
 
 import { Currency } from '@/types';
-import { detectCardType } from '@/utils/format';
+import { detectCardType, formatCardNumber, formatExpiry } from '@/utils/format';
 import { validateAmount, validateCardNumber, validateCVV, validateExpiry, validateName } from '@/utils/validate';
+import { Button, Input, Select } from 'antd';
 
 export interface CardFormData {
     cardholderName: string;
@@ -21,7 +22,7 @@ interface CardInputProps {
     disabled: boolean;
 }
 
-export default function CardInput({ form, onSubmit, disabled }: CardInputProps) {
+export default function CardInput({ form, onChange, onFocusChange, onSubmit, disabled }: CardInputProps) {
     const cardType = detectCardType(form.cardNumber);
 
     const errors = {
@@ -32,11 +33,21 @@ export default function CardInput({ form, onSubmit, disabled }: CardInputProps) 
         amount: validateAmount(form.amount),
     };
 
+    console.log(errors);
+
     const isValid = Object.values(errors).every((e) => e === null);
 
-    function handleSubmit(e: React.FormEvent) {
+    function update(field: keyof CardFormData, value: string) {
+        onChange({ ...form, [field]: value });
+    }
+
+    function handleSubmit(e: { preventDefault: () => void }) {
         e.preventDefault();
-        if (!isValid || disabled) return;
+
+        if (!isValid || disabled) {
+            return;
+        }
+
         onSubmit();
     }
 
@@ -45,7 +56,94 @@ export default function CardInput({ form, onSubmit, disabled }: CardInputProps) 
             onSubmit={handleSubmit}
             className='space-y-4 w-full'
         >
-            CardInput
+            <label htmlFor='cardholderName'>Cardholder Name</label>
+            <Input
+                id='cardholderName'
+                type='text'
+                value={form.cardholderName}
+                onChange={(e) => update('cardholderName', e.target.value)}
+                placeholder='John Doe'
+                disabled={disabled}
+                size='large'
+            />
+            <label htmlFor='cardNumber'>Card Number</label>
+            <Input
+                id='cardNumber'
+                type='text'
+                value={form.cardNumber}
+                onChange={(e) => update('cardNumber', formatCardNumber(e.target.value))}
+                maxLength={19}
+                placeholder='4242 4242 4242 4242'
+                disabled={disabled}
+                size='large'
+            />
+
+            <label htmlFor='expiry'>Expiry (MM/YY)</label>
+            <Input
+                id='expiry'
+                type='text'
+                value={form.expiry}
+                onChange={(e) => update('expiry', formatExpiry(e.target.value))}
+                maxLength={5}
+                placeholder='12/26'
+                disabled={disabled}
+                size='large'
+            />
+
+            <label htmlFor='cvv'>CVV</label>
+            <Input
+                id='cvv'
+                type='password'
+                value={form.cvv}
+                onChange={(e) => {
+                    const digits = e.target.value.replace(/\D/g, '');
+                    update('cvv', digits.slice(0, 3));
+                }}
+                maxLength={3}
+                placeholder='123'
+                disabled={disabled}
+                size='large'
+            />
+
+            <label htmlFor='amount'>Amount</label>
+
+            <Input
+                id='amount'
+                type='text'
+                value={form.amount}
+                onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9.]/g, '');
+                    update('amount', val);
+                }}
+                placeholder='100.00'
+                disabled={disabled}
+                size='large'
+            />
+
+            <label htmlFor='currency'>Currency</label>
+
+            <Select
+                id='currency'
+                value={form.currency}
+                disabled={disabled}
+                className='w-full'
+                onSelect={(v) => update('currency', v)}
+                options={[
+                    { value: 'INR', label: 'INR' },
+                    { value: 'USD', label: 'USD' },
+                ]}
+                size='large'
+            />
+
+            <Button
+                htmlType='submit'
+                type='primary'
+                className='w-full'
+                size='large'
+                disabled={!isValid || disabled}
+            >
+                Pay {form.amount && !errors.amount ? `${form.currency === 'INR' ? '₹ ' : '$ '}${form.amount}` : ''}
+            </Button>
         </form>
     );
 }
