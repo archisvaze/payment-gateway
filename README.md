@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Payment Gateway
 
-## Getting Started
+A simulated payment gateway UI built with Next.js (App Router), TypeScript, Tailwind CSS, Ant Design and Zustand.
 
-First, run the development server:
+## Setup
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js 16**
+- **TypeScript**
+- **Tailwind CSS**
+- **Zustand**
+- **react-credit-cards-2**
 
-## Learn More
+## Features
 
-To learn more about Next.js, take a look at the following resources:
+- Real-time form validation with per-field error messages on blur
+- Auto-formatting card number (spaces every 4 digits) and expiry (MM/YY)
+- Card type detection (Visa, Mastercard)
+- Live card preview that updates as you type
+- Full payment lifecycle: Idle → Processing → Success / Failed / Timeout
+- Mock API at `/api/pay` with randomized outcomes (60% success, 25% failure, 15% timeout)
+- Frontend timeout handling via AbortController (6s cutoff)
+- Retry logic with max 3 attempts per transaction
+- Idempotent transactions using `crypto.randomUUID()`
+- Persistent transaction history via localStorage
+- Expandable transaction detail view
+- Responsive layout
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Assumptions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Card validation is format-based only (length, prefix, expiry date)
+- The mock API uses `Math.random()` for outcome simulation.
+- Currency selector supports INR and USD. No exchange rate logic.
+- Transaction history is stored in localStorage with no size limit enforcement.
 
-## Deploy on Vercel
+## What I'd Improve Given More Time
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Add transition animations between payment states
+- Add unit tests for validation and formatting utils
+- Add export/clear functionality for transaction history
+- Add Accessiblilty visible labels, `aria-describedby` on errors, focus management on state transitions
